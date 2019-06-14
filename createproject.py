@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """Creates a project with my common structure and includes.
 
 Directory structure of the new project will be created in the
@@ -18,6 +20,7 @@ current directory and will look like:
 import os
 import shutil
 import subprocess
+import argparse
 
 git_modules = [
     {
@@ -139,7 +142,13 @@ class ProjectCreator(object):
 
 
 def main():
-    with ProjectCreator("test") as pc:
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("name", help="name of the project to create")
+
+    args = parser.parse_args()
+
+    with ProjectCreator(args.name) as pc:
         pc.setup_dirs()
         pc.copy_project_template()
         pc.setup_git()
