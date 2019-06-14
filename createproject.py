@@ -23,15 +23,19 @@ import subprocess
 class cd:
     """Context manager for changing the current working directory"""
 
-    def __init__(self, newPath):
-        self.newPath = os.path.expanduser(newPath)
+    def __init__(self, new_path):
+        self.new_path = os.path.expanduser(new_path)
 
     def __enter__(self):
-        self.savedPath = os.getcwd()
-        os.chdir(self.newPath)
+        self.saved_path = os.getcwd()
+        os.chdir(self.new_path)
 
     def __exit__(self, etype, value, traceback):
-        os.chdir(self.savedPath)
+        os.chdir(self.saved_path)
+
+
+class ProjectAlreadyExistsError(Exception):
+    pass
 
 
 class ProjectCreator(object):
@@ -47,6 +51,16 @@ class ProjectCreator(object):
         self.template_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)), "templates", "createproject"
         )
+        self.has_started_creating_dirs = False
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, etype, value, traceback):
+
+        if etype is not None and self.has_started_creating_dirs:
+            shutil.rmtree(self.project_path)
+        return True
 
     def setup_git(self):
         # Make sure we're keeping the empty ProjectSpecific.pretty directory:
@@ -60,8 +74,11 @@ class ProjectCreator(object):
     def setup_dirs(self):
 
         if os.path.isdir(self.project_path):
-            print(f"ERROR: Directory {self.project_path + os.sep} already exists.")
-            exit(1)
+            error = f"ERROR: Directory {self.project_path + os.sep} already exists."
+            print(error)
+            raise ProjectAlreadyExistsError(error)
+
+        self.has_started_creating_dirs
 
         print(f"Creating file structure in {self.project_path}")
         os.makedirs(self.project_path)
@@ -88,10 +105,10 @@ class ProjectCreator(object):
 
 
 def main():
-    pc = ProjectCreator("test")
-    pc.setup_dirs()
-    pc.copy_project_template()
-    pc.setup_git()
+    with ProjectCreator("test") as pc:
+        pc.setup_dirs()
+        pc.copy_project_template()
+        pc.setup_git()
 
 
 if __name__ == "__main__":
