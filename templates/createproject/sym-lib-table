@@ -1,0 +1,3 @@
+(sym_lib_table
+  (lib (name _CrumpSchemes)(type Legacy)(uri ${KIPRJMOD}/includes/CrumpSchemes/crumpschemes.lib)(options "")(descr ""))
+)

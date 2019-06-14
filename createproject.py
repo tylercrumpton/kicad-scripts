@@ -104,6 +104,12 @@ class ProjectCreator(object):
             os.path.join(self.template_path, "projectname.sch"),
             os.path.join(self.hardware_path, f"{self.project_name}.sch"),
         )
+        shutil.copy(
+            os.path.join(self.template_path, "fp-lib-table"), self.hardware_path
+        )
+        shutil.copy(
+            os.path.join(self.template_path, "sym-lib-table"), self.hardware_path
+        )
 
 
 def main():
