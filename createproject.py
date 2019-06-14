@@ -19,6 +19,21 @@ import os
 import shutil
 import subprocess
 
+git_modules = [
+    {
+        "path": "hardware/includes/CrumpPrints.pretty",
+        "url": "https://github.com/tylercrumpton/CrumpPrints.pretty.git",
+    },
+    {
+        "path": "hardware/includes/CrumpSchemes",
+        "url": "https://github.com/tylercrumpton/CrumpSchemes.git",
+    },
+    {
+        "path": "hardware/includes/CrumpPrintSymbols.pretty",
+        "url": "https://github.com/tylercrumpton/CrumpPrintSymbols.pretty.git",
+    },
+]
+
 
 class cd:
     """Context manager for changing the current working directory"""
@@ -66,9 +81,17 @@ class ProjectCreator(object):
         # Make sure we're keeping the empty ProjectSpecific.pretty directory:
         open(os.path.join(self.project_specific_path, ".gitkeep"), "a").close()
 
-        # Init git and stage all files for initial commit:
         with cd(self.project_path):
             subprocess.run(["git", "init"])
+
+            print("Adding CrumpLibs for schematic symbols and footprints")
+            for module in git_modules:
+                subprocess.run(
+                    ["git", "submodule", "add", module["url"], module["path"]],
+                    capture_output=True,
+                )
+
+            print("Staging files for Git commit")
             subprocess.run(["git", "add", "."])
 
     def setup_dirs(self):
@@ -93,10 +116,7 @@ class ProjectCreator(object):
             os.path.join(self.template_path, "DOTgitignore"),
             os.path.join(self.project_path, ".gitignore"),
         ),
-        shutil.copy(
-            os.path.join(self.template_path, "DOTgitmodules"),
-            os.path.join(self.project_path, ".gitmodules"),
-        )
+
         print(f"Copying KiCad project template to {self.hardware_path}")
         shutil.copy(
             os.path.join(self.template_path, "projectname.kicad_pcb"),
