@@ -89,8 +89,14 @@ class ProjectCreator(object):
     def copy_project_template(self):
 
         print(f"Copying Git files to {self.project_path}")
-        shutil.copy(os.path.join(self.template_path, ".gitignore"), self.project_path)
-        shutil.copy(os.path.join(self.template_path, ".gitmodules"), self.project_path)
+        shutil.copy(
+            os.path.join(self.template_path, "DOTgitignore"),
+            os.path.join(self.project_path, ".gitignore"),
+        ),
+        shutil.copy(
+            os.path.join(self.template_path, "DOTgitmodules"),
+            os.path.join(self.project_path, ".gitmodules"),
+        )
         print(f"Copying KiCad project template to {self.hardware_path}")
         shutil.copy(
             os.path.join(self.template_path, "projectname.kicad_pcb"),
